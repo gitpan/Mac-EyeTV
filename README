@@ -12,11 +12,11 @@ SYNOPSIS
         print "$number $name\n";
       }
 
-      # See Mac::EyeTV::Program
-      foreach my $program ($eyetv->programs) {
-        my $start = $program->start;
-        my $stop  = $program->stop;
-        my $title = $program->title;
+      # See Mac::EyeTV::Programme
+      foreach my $programme ($eyetv->programmes) {
+        my $start = $programme->start;
+        my $stop  = $programme->stop;
+        my $title = $programme->title;
         print "$title $start - $stop\n";
       }
 
@@ -27,9 +27,13 @@ DESCRIPTION
     you to interface to the EyeTV software, view the channel list and the
     recorded programmes and schedule recordings.
 
-    See Mac::EyeTV::Program for information on scheduling a recording.
+    See Mac::EyeTV::Programme for information on scheduling a recording.
 
-    You should create Mac::Glue bindings to EyeTV before using this.
+    You should create Mac::Glue bindings to EyeTV before using this (along
+    the lines of 'sudo gluemac EyeTV').
+
+    The EyeTV software itself is available from Elgato Systems at
+    http://www.elgato.com/index.php?file=support_updates_eyetv
 
 METHODS
   new
@@ -47,14 +51,14 @@ METHODS
         print "$number $name\n";
       }
 
-  programs
-    This returns the programs known by EyeTV:
+  programmes
+    This returns the programmes known by EyeTV:
 
-      # See Mac::EyeTV::Program
-      foreach my $program ($eyetv->programs) {
-        my $start = $program->start;
-        my $stop  = $program->stop;
-        my $title = $program->title;
+      # See Mac::EyeTV::Programme
+      foreach my $program ($eyetv->programmes) {
+        my $start = $programme->start;
+        my $stop  = $programme->stop;
+        my $title = $programme->title;
         print "$title $start - $stop\n";
       }
 

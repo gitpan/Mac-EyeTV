@@ -10,7 +10,6 @@ my $build = Module::Build->new(
     'DateTime' => '0',
     'DateTime::Format::Strptime' => '0',
     'Class::Accessor::Fast' => '0',
-    'Mac::AppleScript' => '0',
   },
 );
 $build->create_build_script;

@@ -6,7 +6,7 @@ use Mac::EyeTV::Channel;
 use Mac::EyeTV::Programme;
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(qw(eyetv));
-our $VERSION = "0.28";
+our $VERSION = "0.29";
 
 sub new {
   my $class = shift;
@@ -107,7 +107,11 @@ and the recorded programmes and schedule recordings.
 
 See Mac::EyeTV::Programme for information on scheduling a recording.
 
-You should create Mac::Glue bindings to EyeTV before using this.
+You should create Mac::Glue bindings to EyeTV before using this
+(along the lines of 'sudo gluemac EyeTV').
+
+The EyeTV software itself is available from Elgato Systems at
+http://www.elgato.com/index.php?file=support_updates_eyetv
 
 =head1 METHODS
 

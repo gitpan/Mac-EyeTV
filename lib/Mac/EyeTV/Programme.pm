@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use DateTime;
 use DateTime::Format::Strptime;
-use Mac::AppleScript qw(RunAppleScript);
 use base qw(Class::Accessor::Fast);
 
 __PACKAGE__->mk_accessors(qw(programme start stop title
@@ -23,22 +22,19 @@ sub record {
   my $title = $self->title;
   my $description = $self->description || "";
   my $channel_number = $self->channel_number;
-
-  my $formatter = DateTime::Format::Strptime->new(
-    pattern     => '%A, %B %d, %Y %I:%M:%S %p',
-  );
-  my $date = $formatter->format_datetime($start);
   my $duration = ($stop->epoch - $start->epoch);
 
-  $description =~ s/"/'/g;
-
-my $applescript = qq#
-tell application "EyeTV"
-	make new program with properties {start time:date "$date", duration:$duration, title:"$title", description:"$description", channel number:$channel_number}
-end tell
-#;
-#  print $applescript;
-  RunAppleScript($applescript) or die "Didn't work! $@";
+  my $eyetv = Mac::Glue->new('EyeTV');
+  $eyetv->make(
+    new => 'program',
+    with_properties => {
+      'start time' => $start->epoch,
+      duration => $duration,
+      title => $title,
+      description => $description,
+      'channel number' => $channel_number,
+    },
+  );
 }
 
 1;
@@ -47,7 +43,7 @@ __END__
 
 =head1 NAME
 
-Mac::EyeTV::Programme - An EyeTV program
+Mac::EyeTV::Programme - An EyeTV programme
 
 =head1 SYNOPSIS
 

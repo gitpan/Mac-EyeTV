@@ -7,7 +7,6 @@ WriteMakefile
           'NAME' => 'Mac::EyeTV',
           'VERSION_FROM' => 'lib/Mac/EyeTV.pm',
           'PREREQ_PM' => {
-                           'Mac::AppleScript' => '0',
                            'DateTime' => '0',
                            'Mac::Glue' => '0',
                            'DateTime::Format::Strptime' => '0',
