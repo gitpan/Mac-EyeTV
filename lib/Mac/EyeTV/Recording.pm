@@ -1,19 +1,21 @@
-package Mac::EyeTV::Programme;
+package Mac::EyeTV::Recording;
 use strict;
 use warnings;
 use DateTime;
 use DateTime::Format::Strptime;
+use Mac::AppleScript qw(RunAppleScript);
+use URI::file;
 use base qw(Class::Accessor::Fast);
 
 __PACKAGE__->mk_accessors(
-  qw(programme start stop title
+  qw(recording start stop title
     description channel_number station_name input_source repeats quality
-    enabled id)
+    enabled busy id)
 );
 
 sub delete {
   my $self = shift;
-  $self->programme->delete;
+  $self->recording->delete;
 }
 
 sub duration {
@@ -21,27 +23,17 @@ sub duration {
   return $self->stop - $self->start;
 }
 
-sub record {
-  my $self = shift;
-
-  my $start          = $self->start;
-  my $stop           = $self->stop;
-  my $title          = $self->title;
-  my $description    = $self->description || "";
-  my $channel_number = $self->channel_number;
-  my $duration       = ($stop->epoch - $start->epoch);
-
-  my $eyetv = Mac::Glue->new('EyeTV');
-  $eyetv->make(
-    new             => 'program',
-    with_properties => {
-      'start time'     => $start->epoch,
-      duration         => $duration,
-      title            => $title,
-      description      => $description,
-      'channel number' => $channel_number,
-    },
-  );
+sub export {
+  my($self, $path) = @_;
+  
+  my $id = $self->id;
+  my $applescript = qq{
+tell application "EyeTV"
+  export from recording id $id to file "$path" as MPEGPS
+end tell
+  };
+  warn $applescript;
+  RunAppleScript($applescript);
 }
 
 1;
@@ -75,7 +67,10 @@ Mac::EyeTV::Programme - An EyeTV programme
   $programme->description($description);
   $programme->channel_number($channel_number);
   $programme->record;
-  
+
+  # Export an existing recording
+  $programme->export("new.mpg");
+
   # Delete an existing programme
   $programme->delete;
 
@@ -92,6 +87,12 @@ represent the existing and future programs.
 This is the constructor, which takes no arguments:
 
   my $eyetv = Mac::EyeTV->new();
+
+=head2 export
+
+Exports the programme as an MPEGPS file:
+
+  $programme->export("new.mpg");
 
 =head2 delete
 

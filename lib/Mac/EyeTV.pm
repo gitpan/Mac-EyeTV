@@ -4,9 +4,10 @@ use warnings;
 use Mac::Glue;
 use Mac::EyeTV::Channel;
 use Mac::EyeTV::Programme;
+use Mac::EyeTV::Recording;
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(qw(eyetv));
-our $VERSION = "0.29";
+our $VERSION = "0.30";
 
 sub new {
   my $class = shift;
@@ -20,7 +21,7 @@ sub new {
 }
 
 sub channels {
-  my $self =  shift;
+  my $self  = shift;
   my $eyetv = $self->eyetv;
   my @channels;
 
@@ -36,7 +37,7 @@ sub channels {
 }
 
 sub programmes {
-  my $self =  shift;
+  my $self  = shift;
   my $eyetv = $self->eyetv;
   my @programmes;
 
@@ -45,8 +46,11 @@ sub programmes {
     my $programme = Mac::EyeTV::Programme->new;
     $programme->programme($eyetv_programme);
 
-    my $start = DateTime->from_epoch(epoch => $eyetv_programme->prop("start time")->get);
-    my $duration = DateTime::Duration->new(seconds => $eyetv_programme->prop("duration")->get);
+    my $start =
+      DateTime->from_epoch(epoch => $eyetv_programme->prop("start time")->get);
+    my $duration =
+      DateTime::Duration->new(
+      seconds => $eyetv_programme->prop("duration")->get);
     my $stop = $start + $duration;
 
     $programme->start($start);
@@ -54,11 +58,56 @@ sub programmes {
 
     my %map = (
       'channel_number' => 'channel number',
-      'station_name ' => 'station name',
-      'input source' => 'input source',
+      'station_name '  => 'station name',
+      'input_source'   => 'input source',
+      'id'             => 'unique ID',
     );
 
-    foreach my $prop (qw(title description channel_number station_name input_source repeats quality enabled)) {
+    foreach my $prop (
+      qw(title description channel_number station_name input_source repeats quality enabled id)
+      )
+    {
+      my $eyetv_prop = $map{$prop} || $prop;
+      my $value = $eyetv_programme->prop($eyetv_prop)->get;
+      $programme->$prop($value);
+    }
+
+    push @programmes, $programme;
+  }
+  return @programmes;
+}
+
+sub recordings {
+  my $self  = shift;
+  my $eyetv = $self->eyetv;
+  my @programmes;
+
+  my @eyetv_programmes = $eyetv->obj('recordings')->get;
+  foreach my $eyetv_programme (@eyetv_programmes) {
+    my $programme = Mac::EyeTV::Recording->new;
+    $programme->recording($eyetv_programme);
+
+    my $start =
+      DateTime->from_epoch(epoch => $eyetv_programme->prop("start time")->get);
+    my $duration =
+      DateTime::Duration->new(
+      seconds => $eyetv_programme->prop("duration")->get);
+    my $stop = $start + $duration;
+
+    $programme->start($start);
+    $programme->stop($stop);
+
+    my %map = (
+      'channel_number' => 'channel number',
+      'station_name '  => 'station name',
+      'input_source'   => 'input source',
+      'id'             => 'unique ID',
+    );
+
+    foreach my $prop (
+      qw(title description channel_number station_name input_source repeats quality enabled busy id)
+      )
+    {
       my $eyetv_prop = $map{$prop} || $prop;
       my $value = $eyetv_programme->prop($eyetv_prop)->get;
       $programme->$prop($value);
@@ -144,13 +193,25 @@ This returns the programmes known by EyeTV:
     print "$title $start - $stop\n";
   }
 
+=head2 recordings
+
+This returns the recordings known by EyeTV:
+
+  # See Mac::EyeTV::Programme
+  foreach my $program ($eyetv->programmes) {
+    my $start = $programme->start;
+    my $stop  = $programme->stop;
+    my $title = $programme->title;
+    print "$title $start - $stop\n";
+  }
+
 =head1 AUTHOR
 
 Leon Brocard <acme@astray.com>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, Leon Brocard
+Copyright (C) 2004-5, Leon Brocard
 
 This module is free software; you can redistribute it or modify it
 under the same terms as Perl itself.

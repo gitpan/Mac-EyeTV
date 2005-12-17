@@ -48,7 +48,7 @@ Leon Brocard <acme@astray.com>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, Leon Brocard
+Copyright (C) 2004-5, Leon Brocard
 
 This module is free software; you can redistribute it or modify it
 under the same terms as Perl itself.
